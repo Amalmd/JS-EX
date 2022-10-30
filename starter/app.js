@@ -745,20 +745,46 @@ const deleteCarFromAgency = (agencyObject, carNumber) => {};
 //? @param {object}   - agencyObj
 //? @param {number}   - amount - negative or positive amount
 // ? @return {number} - the new amount of agency cash
-const decOrIncCashOfAgency = (agencyObj, amount) => {};
+const decOrIncCashOfAgency = (agencyObj, amount) => {
+  // console.log(agencyObj[0].cash);
+
+  return agencyObj.map((e) => e.cash - amount);
+};
+console.log(decOrIncCashOfAgency(ourCarMarket.sellers, 100000));
+console.log(ourCarMarket);
 
 //* 16. decOrIncCreditOfAgency
 //? @param {object}  - agencyObj
 //? @param {number}  - amount - negative or positive amount
 //? @return {number} - the new amount of agency credit
 //?                    The lowest credit is 0
-const decOrIncCreditOfAgency = (agencyObj, amount) => {};
+const decOrIncCreditOfAgency = (agencyObj, amount) => {
+  return agencyObj.map((e) => e.cash + amount);
+};
+console.log(decOrIncCreditOfAgency(ourCarMarket.sellers, 100000));
 
 //* 17. setCarToCustomer
 //? @param {object} - customerObj
 //? @param {object} - carObject
 //? @return {object[]} - allCarsOfCostumer
-const setCarToCustomer = (customerObj, carObject) => {};
+const setCarToCustomer = (customerObj, carObject) => {
+  return customerObj.filter((el) => {
+    // console.log(el.cars);
+    const cars = el.cars;
+    console.log(cars);
+    cars.Ferrari = carObject;
+  });
+};
+
+console.log(
+  setCarToCustomer(ourCarMarket.customers, {
+    name: "f40",
+    year: 2022,
+    price: 1548100,
+    carNumber: "E2W_123",
+    ownerId: "xNHjN532s",
+  })
+);
 
 //* 18. deleteCarOfCostumer
 //? @param {object} - customerObj
@@ -771,7 +797,10 @@ const deleteCarOfCostumer = (costumerObj, carNumber) => {};
 //? @param {number}  - amount - negative or positive amount
 //? @return {number} - costumerCash
 //?                    The lowest cash amount is 0
-const decOrIncCashOfCustomer = (costumerObj, amount) => {};
+const decOrIncCashOfCustomer = (costumerObj, amount) => {
+  return costumerObj.map((e) => e.cash - amount);
+};
+console.log(decOrIncCashOfCustomer(ourCarMarket.customers, 10000));
 
 //! ---------------- Hard ----------------------
 //* 20. setPropertyBrandToAllCars
