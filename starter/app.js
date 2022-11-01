@@ -982,17 +982,36 @@ const urls = [
 
 const carMarket = {};
 
-const fetchData = async (url) => {
+/* const fetchData = async (url) => {
   const res = await fetch(url);
   const data = await res.json();
   return data;
   // return res.json();
-};
+}; */
 
-// const setCarMarketData = async () => {
-//   carMarket.sellers = await fetchData('https://capsules7.herokuapp.com/api/carMarket/agencies');
-// };
-// setCarMarketData();
+const setCarMarketData = async () => {
+  carMarket.sellers = await fetchData(
+    "https://capsules7.herokuapp.com/api/carMarket/agencies"
+  );
+  carMarket.customers = await fetchData(
+    "https://capsules7.herokuapp.com/api/carMarket/customers"
+  );
+  carMarket.taxesAuthority = await fetchData(
+    "https://capsules7.herokuapp.com/api/carMarket/tax"
+  );
+};
+setCarMarketData();
+
+async function fetchData(url) {
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    // console.log(data);
+    return data;
+  } catch (e) {
+    console.log("error");
+  }
+}
 
 const getAllPromises = async (arrOfUrls) => {
   const promisesArr = arrOfUrls.map((url) => {
@@ -1017,7 +1036,7 @@ const startApp = async () => {
   spinnerToggle(true);
   const res = await getAllPromises(urls);
   spinnerToggle(false);
-  console.log(res);
+  //console.log(res);
 };
 startApp();
 
@@ -1026,9 +1045,73 @@ startApp();
 //? When the user clicks the button display a list of Customers / Agencies names
 //? Only one list can be presented at a time
 
+const customersBtn = document.getElementById("customers");
+const agenciesBtn = document.getElementById("agencies");
+const agenciesList = document.getElementById("agenciesList");
+const customersList = document.getElementById("customersList");
+const card = document.getElementById("card");
+
+const clean_screen = () => {
+  agenciesList.innerHTML = "";
+  customersList.innerHTML = "";
+};
+
+const getCustomersList = () => {
+  clean_screen();
+  carMarket.customers.forEach((e) => {
+    let customerName = document.createElement("button");
+    customerName.innerText = e.name;
+    customersList.appendChild(customerName);
+  });
+};
+customersBtn.addEventListener("click", getCustomersList);
+customersList.addEventListener("click", (e) => {
+  console.log(e.target.textContent);
+  showCard(e.target.textContent);
+});
+
+// const get_agency_card = (agencyNameBtn) =>{
+//   clean_screen();
+//   //let box= document.createElement('div');
+//   let h2 =document.createElement('h2')
+//   h2.innerText = "name: " + agenciesBtn.innerText;
+//   card.appendChild(h2);
+
+// }
+
+const getAgenciesList = () => {
+  clean_screen();
+  console.log(carMarket);
+  carMarket.sellers.forEach((e) => {
+    let agencyName = document.createElement("button");
+    agencyName.setAttribute("id", "agencyNameBtn");
+    agencyName.innerText = e.agencyName;
+    //console.log(agencyName.innerText);
+    agenciesList.appendChild(agencyName);
+  });
+};
+
+//const agencyNameBtn = document.getElementById("agencyNameBtn");
+agenciesBtn.addEventListener("click", getAgenciesList);
+agenciesList.addEventListener("click", (e) => {
+  console.log(e.target.textContent);
+  showCard(e.target.textContent);
+});
+
 //? 4)
-//? When the user clicks on single name of a Customer / Agency
+//? When the user clicks on a single name of a Customer / Agency
 //? Show over the screen a card with all the data of that particular Customer / Agency
+
+const showCard = async (allData) => {
+  const carMarketObj = await fetchData();
+  let currentBtn = "";
+  if (currentBtn === "customers") {
+    carMarketObj.customers.forEach((customer) => {
+      if (customer.name === allData);
+      console.log(customer);
+    });
+  }
+};
 
 //? 5)
 //? When the user clicks on get image of the car fetch the car image and display another card with the image.
@@ -1045,3 +1128,57 @@ startApp();
 //* You can divide the work inside the capsule and share the responsibility
 //* Separate the functions of logic and The functions related to HTML
 //* Don't mess with the design (CSS)
+
+const carMarketObj = {
+  sellers: null,
+  customrs: null,
+};
+
+/* async function fetchData(url) {
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    console.log(data);
+    return data;
+  } catch (e) {
+    console.log("error");
+  }
+} */
+const fetchID = async (url, searchId) => {
+  const data = await fetchData(url);
+  const agenciesId = [];
+  data.forEach((agency) => {
+    agenciesId.push(agency[searchId]);
+  });
+  return agenciesId;
+};
+// //fetchID('https://capsules7.herokuapp.com/api/carMarket/agencies', "agencies");
+// //fetchID('https://capsules7.herokuapp.com/api/carMarket/customers', "id");
+
+const getData = async (arr, temp) => {
+  let idArr = await Promise.all(arr);
+  let tempArr = [];
+  for (let id of idArr) {
+    let res = fetchData(
+      `https://capsules7.herokuapp.com/api/carMarket/${temp}/${id}`
+    );
+    tempArr.push(res);
+  }
+  const promises = await Promise.all(tempArr);
+  return promises;
+};
+const test = async () => {
+  const fetchbla = await fetchID(
+    "https://capsules7.herokuapp.com/api/carMarket/agencies",
+    "agencyId"
+  );
+
+  console.log(fetchbla);
+  let data = [];
+  data.push(getData(fetchbla, "agencies"));
+  const bla = await Promise.all(data);
+  //   // console.log(bla.flat());
+  carMarketObj["sellers"] = bla.flat();
+};
+
+test();
